@@ -1,67 +1,85 @@
 const { ObjectId } = require('mongoose').Types;
-const { Student, Course } = require('../models');
+const { Thought, User } = require('../models');
 
-// Aggregate function to get the number of students overall
-const headCount = async () =>
-  Student.aggregate()
-    .count('studentCount')
-    .then((numberOfStudents) => numberOfStudents);
+// Aggregate function to get the number of overall thoughts
+const thoughtCount = async () =>
+  Thought.find()
+    .count('thoughtCount')
+    .then((numberOfThoughts) => numberOfThoughts);
 
 // Aggregate function for getting the overall grade using $avg
-const grade = async (studentId) =>
-  Student.aggregate([
-    // only include the given student by using $match
-    { $match: { _id: ObjectId(studentId) } },
-    {
-      $unwind: '$assignments',
-    },
-    {
-      $group: {
-        _id: ObjectId(studentId),
-        overallGrade: { $avg: '$assignments.score' },
-      },
-    },
-  ]);
+// const grade = async (studentId) =>
+//   Student.aggregate([
+//     // only include the given student by using $match
+//     { $match: { _id: ObjectId(studentId) } },
+//     {
+//       $unwind: '$assignments',
+//     },
+//     {
+//       $group: {
+//         _id: ObjectId(studentId),
+//         overallGrade: { $avg: '$assignments.score' },
+//       },
+//     },
+//   ]);
 
 module.exports = {
-  // Get all students
-  getStudents(req, res) {
-    Student.find()
-      .then(async (students) => {
-        const studentObj = {
-          students,
-          headCount: await headCount(),
+  // Get all thoughts
+  getAllThoughts(req, res) {
+    Thought.find({})
+      .then(async (thoughts) => {
+        const thoughtsObj = {
+          thoughts,
+          thoughtCount: await thoughtCount(),
         };
-        return res.json(studentObj);
+        return res.json(thoughtsObj);
       })
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
       });
   },
-  // Get a single student
-  getSingleStudent(req, res) {
-    Student.findOne({ _id: req.params.studentId })
+  // Get a thought by ID
+  getThoughtById(req, res) {
+    Thought.findOne({ _id: req.params.thoughtId })
       .select('-__v')
-      .then(async (student) =>
-        !student
-          ? res.status(404).json({ message: 'No student with that ID' })
+      .then(async (thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
           : res.json({
-              student,
-              grade: await grade(req.params.studentId),
+              thought              
             })
       )
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
       });
-  },
-  // create a new student
-  createStudent(req, res) {
-    Student.create(req.body)
-      .then((student) => res.json(student))
+  },  
+  // create a new thought tagged to a user
+  addThought(req, res) {
+    console.log('You are adding a new thought!');
+    console.log(req.body);
+    Thought.create(body)
+      .then(({ _id }) => {
+        return User.findOneAndUpdate(
+          { _id: params.userId },
+          { $push: { thoughts: _id }},
+          { new: true }
+        );
+      })
+      .then(async (user) => 
+        !user
+        ? res.status(404).json({ message: 'No associated user' })
+        : res.json({
+            user
+        })
+      )
       .catch((err) => res.status(500).json(err));
   },
+
+
+
+  
   // Delete a student and remove them from the course
   deleteStudent(req, res) {
     Student.findOneAndRemove({ _id: req.params.studentId })
