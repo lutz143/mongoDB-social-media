@@ -1,5 +1,7 @@
+// require mongoose schema and types
 const { Schema, Types } = require('mongoose');
-// will need to create a utils possibly for a timestamp on query
+// require the date format helper in the utils folder
+const dateFormat = require('../utils/dateFormat');
 
 const thoughtSchema = new Schema(
   {
