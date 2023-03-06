@@ -1,4 +1,4 @@
-const { Schema, Types } = require('mongoose');
+const { Schema, Types, model } = require('mongoose');
 
 // create the User schema with references to thoughts and friends
 const userSchema = new Schema(
@@ -15,8 +15,14 @@ const userSchema = new Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      validate: [validateEmail, 'Please add a valid email address'],
-        match: [/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/, 'Please fill a valid email address']
+      validate: {
+        validator(validEmail) {
+          return /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/.test(
+            validEmail
+          );
+        },
+        message: 'Please fill a valid email address',
+      },
     },
     thoughts: [{
       type: Schema.Types.ObjectId,
