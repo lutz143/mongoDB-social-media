@@ -59,7 +59,7 @@ module.exports = {
   addThought(req, res) {
     console.log('You are adding a new thought!');
     console.log(req.body);
-    Thought.create(body)
+    Thought.create(req.body)
       .then(({ _id }) => {
         return User.findOneAndUpdate(
           { _id: params.userId },
