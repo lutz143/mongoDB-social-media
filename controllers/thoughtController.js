@@ -60,10 +60,11 @@ module.exports = {
     console.log('You are adding a new thought!');
     console.log(req.body);
     Thought.create(req.body)
-      .then(({ _id }) => {
+      .then((thoughtData) => {
+        console.log(thoughtData);
         return User.findOneAndUpdate(
-          { _id: params.userId },
-          { $push: { thoughts: _id }},
+          { _id: req.body.userId },
+          { $push: { thoughts: thoughtData._id }},
           { new: true }
         );
       })
