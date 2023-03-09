@@ -7,22 +7,6 @@ const thoughtCount = async () =>
     .count('thoughtCount')
     .then((numberOfThoughts) => numberOfThoughts);
 
-// Aggregate function for getting the overall grade using $avg
-// const grade = async (studentId) =>
-//   Student.aggregate([
-//     // only include the given student by using $match
-//     { $match: { _id: ObjectId(studentId) } },
-//     {
-//       $unwind: '$assignments',
-//     },
-//     {
-//       $group: {
-//         _id: ObjectId(studentId),
-//         overallGrade: { $avg: '$assignments.score' },
-//       },
-//     },
-//   ]);
-
 module.exports = {
   // Get all thoughts
   getAllThoughts(req, res) {
@@ -107,7 +91,7 @@ module.exports = {
     console.log(req.body);
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $addToSet: { assignments: req.body } },
+      { $addToSet: { reactions: req.body } },
       { runValidators: true, new: true }
     )
       .then((user) =>
@@ -123,8 +107,8 @@ module.exports = {
   deleteReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reactions: { reactionId: req.params.reactionId } } },
-      { runValidators: true, new: true }
+      { $pull: { reactions: req.body  } },
+      { new: true }
     )
       .then((user) =>
         !user
