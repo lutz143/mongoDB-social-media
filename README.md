@@ -48,7 +48,6 @@ Insomnia was used in order to perform CRUD tests in the development of this app.
 
 ## Questions
 * For questions, you may contact me on GitHub: [lutz143](https://github.com/lutz143)
-* For immediate concerns, email me at: n/a
 
 ---
 
